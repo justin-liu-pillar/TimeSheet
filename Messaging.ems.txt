@@ -1,0 +1,1372 @@
+version=1.0
+
+<start>
+type=FileLastWrite
+key=XRBLTranslator
+Limits=6|11|30
+Name=AON XRBL Translator
+filter=root*.0
+folder=\\webintranet1\D$\data\logfiles\Pillar\Rollover\XRBLTranslator\Initiate\UI\Superb\1.2.1
+Remediation=Check that Scheduled Task is running for 'Pillar.Rollover.Initiate.UI.exe' which is located at: D:\Pillar\Rollover\1.2.1\ on webintranet1 This scheduled task should run using the PILLAR\app_rollover_prod user.
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/SuperB%20XBRL%20Translator.aspx
+<end>
+
+<start>
+type=ADUser
+key=ADUser-app_rollover_prod
+Limits=1|2|3
+username=PILLAR\app_rollover_prod
+descriptionOfImpact=Rollover hub will stop working
+RemediationUrl=http://webapps/wikipit/perspective.aspx?action=view&page=web%20systems:ApplicationAccounts
+TimeFrequencyInSeconds=120
+<end>
+
+<start>
+type=ADUser
+key=ADUser-atoappservice
+Limits=1|2|3
+username=PILLAR\atoappservice
+descriptionOfImpact=Rollover hub will stop working
+RemediationUrl=http://webapps/wikipit/perspective.aspx?action=view&page=web%20systems:ApplicationAccounts
+TimeFrequencyInSeconds=120
+<end>
+
+<start>
+type=ADUser
+key=ADUser-app_xmlconv_prod
+Limits=1|2|3
+username=PILLAR\app_xmlconv_prod
+descriptionOfImpact=Rollover hub will stop working
+RemediationUrl=http://webapps/wikipit/perspective.aspx?action=view&page=web%20systems:ApplicationAccounts
+TimeFrequencyInSeconds=120
+<end>
+
+#### CORE ADMIN CHECKS
+<start>
+type=Sql
+key=Sql-MSHPROD
+Limits=2|2|2
+Name=MSHPROD DB connection
+description=Checks can connect to MSHPROD
+sql=select 1 FROM SYSIBM.SYSDUMMY1;
+dbtype=DB2
+connection=mshprod
+Remediation=Ensure can connect to database (userid is eventmon) 
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Monitoring.aspx
+TimeFrequencyInSeconds=500
+<end>
+
+#<start>
+#type=Sql
+#key=Sql-MsgHeartbeat
+#Limits=1|5|10
+#Name=Message Service Handler MSH heartbeat
+#description=Checks the number of hours since a message last passed through the message service handler
+#sql=multi:@
+#select timestampdiff (8,integer(current timestamp - timestamp(max(message_logged))))
+#from MSH.PERSISTENCE
+#with ur;
+#@
+#dbtype=db2
+#connection=mshprod
+#Remediation=Check Services on PASMARTPROD are started; check connections to registry; check log files on PASMARTPROD
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Message%20Service%20Handler%20Heartbeat.aspx
+#TimeFrequencyInSeconds=1800
+#<end>
+
+<start>
+type=Sql
+key=Sql-Msg2Heartbeat
+Limits=5|6|10
+Name=Message Service Handler MSH2 heartbeat
+description=Checks the number of hours since a message last passed through the message service handler
+sql=multi:@
+select timestampdiff (8,integer(current timestamp - timestamp(max(message_logged))))
+from MSH2.PERSISTENCE
+with ur;
+@
+dbtype=db2
+connection=mshprod
+Remediation=Check Services on PASMARTPROD are started; check connections to registry; check log files on PASMARTPROD
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Message%20Service%20Handler%20Heartbeat.aspx
+TimeFrequencyInSeconds=1800
+HoursCanRun=8-18
+<end>
+
+<start>
+type=Sql
+key=WestpacDataMissingSQL
+Limits=1|1|1
+Name=Westpac Gateway data not downloaded
+description=Checks that the Westpac Gateway Data has been downloaded for the current day
+sql=multi:@
+select
+days(current date) - days(min(max(created_datetime)
+,(select max(created_datetime) from msh.westpac_inbound_rtr )
+,(select max(created_datetime) from msh.westpac_outbound_irr )
+,(select max(created_datetime) from msh.westpac_outbound_rtr )))
+from msh.westpac_inbound_irr
+with ur
+@
+dbtype=db2
+connection=mshprod
+Remediation=Check what data is missing and then log onto the gateway and download the missing data
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Westpac%20Gateway%20Data%20not%20downloaded.aspx
+TimeFrequencyInSeconds=3600
+<end>
+
+<start>
+type=Sql
+key=Sql-mgsrpprd
+Limits=2|2|2
+Name=MGSRPPRD DB connection
+description=Checks smartstm can connect to mgsrpprd
+sql=select 1 FROM SYSIBM.SYSDUMMY1;
+dbtype=DB2
+connection=mgsrpprd
+Remediation=Ensure account is not locked or expired smartstm 
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Monitoring.aspx
+TimeFrequencyInSeconds=500
+<end>
+
+<start>
+type=Sql
+key=Sql-aonprod
+Limits=2|2|2
+Name=AONPROD DB connection
+description=Checks smartsrw can connect to aonprod
+sql=select 1 FROM SYSIBM.SYSDUMMY1;
+dbtype=DB2
+connection=aonprod
+Remediation=Ensure account is not locked or expired smartsrw
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Monitoring.aspx 
+TimeFrequencyInSeconds=500
+<end>
+
+
+
+<start>
+type=Sql
+key=Sql-dbprod
+Limits=2|2|2
+Name=DBPROD DB connection
+description=Checks smartsrw can connect to dbprod
+sql=select 1 FROM SYSIBM.SYSDUMMY1;
+dbtype=DB2
+connection=dbprod
+Remediation=Ensure account is not locked or expired smartsrw
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Monitoring.aspx 
+TimeFrequencyInSeconds=500
+<end>
+
+
+<start>
+type=Sql
+key=Sql-sassprod
+Limits=2|2|2
+Name=SASSPROD DB connection
+description=Checks smartsrw can connect to sassprod
+sql=select 1 FROM SYSIBM.SYSDUMMY1;
+dbtype=DB2
+connection=sassprod
+Remediation=Ensure account is not locked or expired smartsrw
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Monitoring.aspx 
+TimeFrequencyInSeconds=500
+<end>
+
+#### END CORE ADMIN CHECKS
+
+<start>
+type=DiskSpace
+key=pasmartprodDisk
+Limits=3500|1500|500
+Name=Free space on pasmartprod
+description=Free space on pasmartprod
+Remediation=Delete or compress files to free up disk space. For virtual machines, you can also increase the disk capacity.
+machine=pasmartprod
+<end>
+
+#Message Service Handler
+<start>
+type=ServiceStatus
+key=ServiceCheck-pasmartprod-MessageServiceHandler
+machine=pasmartprod
+service=SyncSoft.Platform.Gateway.MessageServiceHandler.Service
+Remediation=Check the status of PASMARTPROD, check the relevant logs, take remedial action and restart the service if necessary
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+<end>
+
+
+##Inbound data adapters
+<start>
+type=ServiceStatus
+key=ServiceCheck-pasmartprod-AON_ERF_PROD
+machine=pasmartprod
+service=SmartStream.Adapter.Inbound.AON_ERF_PROD-1.0.0
+Remediation=Check the status of PASMARTPROD, check the relevant logs, take remedial action and restart the service if necessary
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+<end>
+
+<start>
+type=ServiceStatus
+key=ServiceCheck-pasmartprod-AON_PENSION_PROD
+machine=pasmartprod
+service=SmartStream.Adapter.Inbound.AON_PENSION_PROD-1.0.0
+Remediation=Check the status of PASMARTPROD, check the relevant logs, take remedial action and restart the service if necessary
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+<end>
+
+
+#ATO services
+<start>
+type=ServiceStatus
+key=ServiceCheck-pasmsjobprod01-ATO-MSH
+machine=pasmsjobprod01
+service=Oban.Platform.Gateway.ATOServicesMSH.Service.v2.5.6.1
+Remediation=Check the status of PASMSJOBPROD01, check the relevant logs, take remedial action and restart the service if necessary
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+<end>
+
+<start>
+type=ServiceStatus
+key=ServiceCheck-pasmsjobprod01-ATO-Service-Adapter
+machine=pasmsjobprod01
+service=Oban.Platform.Gateway.Adapter.ATOService.Service.v2.5.6.1
+Remediation=Check the status of PASMSJOBPROD01, check the relevant logs, take remedial action and restart the service if necessary
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+<end>
+
+<start>
+type=ServiceStatus
+key=ServiceCheck-pasmsjobprod01-Inbound-ERF
+machine=pasmsjobprod01
+service=Oban.Platform.Gateway.Adapter.Capital.Inbound.Service.v2.6.4.4
+Remediation=Check the status of PASMSJOBPROD01, check the relevant logs, take remedial action and restart the service if necessary
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+<end>
+
+<start>
+type=ServiceStatus
+key=ServiceCheck-pasmsjobprod01-Inbound-Pension
+machine=pasmsjobprod01
+service=Oban.Platform.Gateway.Adapter.Capital.Inbound.Service.AonPension
+Remediation=Check the status of PASMSJOBPROD01, check the relevant logs, take remedial action and restart the service if necessary
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+<end>
+
+<start>
+type=ServiceStatus
+key=ServiceCheck-pasmsjobprod01-Outbound-ERF
+machine=pasmsjobprod01
+service=Oban.Platform.Gateway.Adapter.Capital.Outbound.Service.v2.6.4.4
+Remediation=Check the status of PASMSJOBPROD01, check the relevant logs, take remedial action and restart the service if necessary
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+<end>
+
+<start>
+type=ServiceStatus
+key=ServiceCheck-pasmsjobprod01-Outbound-Pension
+machine=pasmsjobprod01
+service=Oban.Platform.Gateway.Adapter.Capital.Outbound.Service.AonPension
+Remediation=Check the status of PASMSJOBPROD01, check the relevant logs, take remedial action and restart the service if necessary
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+<end>
+
+<start>
+type=ServiceStatus
+key=ServiceCheck-pasmsmshprod03-AS4-MSH
+machine=pasmsmshprod03
+service=Oban.Platform.Gateway.MessageServiceHandler.Service.v2.6.4.4
+Remediation=Check the status of PASMSMSHPROD03, check the relevant logs, take remedial action and restart the service if necessary
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+<end>
+
+<start>
+type=ServiceStatus
+key=ServiceCheck-pasmsmshprod04-AS4-MSH
+machine=pasmsmshprod04
+service=Oban.Platform.Gateway.MessageServiceHandler.Service.v2.6.4.4
+Remediation=Check the status of PASMSMSHPROD04, check the relevant logs, take remedial action and restart the service if necessary
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+<end>
+
+<start>
+type=ServiceStatus
+key=ServiceCheck-pasmartprod-EnterpriseConsole
+machine=pasmartprod
+service=SyncSoft.Platform.EnterpriseConsole.Service
+Remediation=Check the status of PASMARTPROD, check the relevant logs, take remedial action and restart the service if necessary
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+<end>
+
+
+<start>
+type=WebPage
+key=FWebPage-MessagingPortal2
+method=GET
+url=http://pasmartprod/ATOValidationService/ATOValidationService.svc
+name=PASMARTPROD - ATOValidationService
+Remediation=Check the IIS Service is running on PASMARTPROD or check the atovalidationservice logs on PASMARTPROD for details
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20ATO%20SuperTIC.aspx
+<end>
+
+
+<start>
+type=FolderSize
+key=FolderSize-MSMQ
+folder=\\pasmartprod\c$\Windows\System32\msmq\storage
+name=PASMARTPROD - MSMQ size
+Limits=6000|7000|7500
+Remediation=Execute the process to delete old messages from the MSMQ's on PASMARTPROD. See sharepoint instructions for details. 
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Message%20Service%20Handler%20Archiving.aspx
+<end>
+
+<start>
+type=FileCount
+key=ATOIRRConvErr
+name=ATOIRRConv files in error directory
+Remediation=Move the files out of the error directory and investigate why files were not converted by the ATO IRR EPF Converter application.
+RemediationURL=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20EPF%20Converter%20-%20ATOIRRConvError.aspx
+Limits=1|6|10
+folder=\\webintranet1\d$\data\logfiles\Pillar\ATOIrrConverter
+filter=*
+ThresholdSeconds=300
+CountBeforeThreshold=True
+<end>
+
+<start>
+type=FileCount
+key=ATOIRRConvImp
+name=ATOIRRConv files not imported
+Remediation=Check that the scheduled job is running at 10 min intervals; check how long the files have been sitting in the folder; check if the same filename already exists in the output location.
+RemediationURL=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20EPF%20Converter%20-%20ATOIRRConvStale.aspx
+Limits=1|10|20
+folder=\\pillar.com.au\Shared\Coniston\Business Systems\Data Standards\EPF\ATO
+filter=*
+ThresholdSeconds=1800
+CountBeforeThreshold=True
+<end>
+
+<start>
+type=FileCount
+key=ATOIRRConvImpOLD
+name=ATOIRRConv files in Old Import Folder
+Remediation=Move the files to the new location of P:\Coniston\Business Systems\Data Standards\EPF\ATO 
+RemediationURL=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20EPF%20Converter.aspx
+Limits=1|10|20
+folder=\\data\operations\common\Stronger Super operations\ATO IRR Requests\To be processed
+filter=*
+ThresholdSeconds=1800
+CountBeforeThreshold=True
+<end>
+
+
+
+<start>
+type=Sql
+key=Sql-MsgNotSentAON
+Limits=1|10|20
+Name=Messages not sent from AONPROD
+description=Checks the number of messages in the registry that have not successfully been picked up and sent
+sql=multi:@
+select  count(*)
++ (select count(*) from rollover_request where status = 'AM'and last_modified < current timestamp - 1 hours)
++ (select count(*) from rollover_payment where status = 'AM'and last_modified < current timestamp - 1 hours)
+from electronic_message
+where status = 'AM' and last_modified < current timestamp - 1 hours
+with ur;
+@
+dbtype=DB2
+connection=aonprod
+Remediation=Check the fund outbound adaptor is started, check the adaptor logs, check the source data in the registry.
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/How%20to%20Check%20DS%20Rollovers%20Messages%20Not%20Sent.aspx
+TimeFrequencyInSeconds=1800
+<end>
+
+<start>
+type=Sql
+key=Sql-FailedFundLookupAON
+Limits=5|10|20
+Name=Excessive Fund Lookup Errors from AONPROD
+description=Checks the number of fund lookup errors in the registry in the last hour
+sql=multi:@
+select count(conversation_id)
+from ato_fund_lookup
+where status = 'LE'
+and date(created_datetime) = current date
+with ur;
+@
+dbtype=DB2
+connection=aonprod
+Remediation=Check the atovalidationservice logs on PASMARTPROD for details of the fund lookup errors. Also refer to electronic_message table in registry for details of error.
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/How%20to%20Check%20DS%20Rollovers%20Unsuccessful%20Fund%20Lookup.aspx
+TimeFrequencyInSeconds=1800
+<end>
+
+
+<start>
+type=Sql
+key=Sql-TFNlookupAON
+Limits=1|10|20
+Name=TFN lookups unsuccessful AONPROD
+description=Checks the number of TFN Lookups in the registry that have not successfully completed
+sql=select count(*) from ( select  a.* from db2inst1.ato_tfn_lookup a join rollover_payment rp on rp.conversation_id = a.conversation_id where a.returned_status = '' and a.created_datetime < (current timestamp - 5 hours) and rp.status not in ('EV','AK','MS','AM','IP','PC','ER','CA') ) with ur;
+dbtype=DB2
+connection=aonprod
+Remediation=Check the data for known issues. Check the atovalidationservice logs on PASMARTPROD for errors
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/How%20to%20Check%20DS%20Rollovers%20Unsuccessful%20TFN%20Lookup.aspx
+TimeFrequencyInSeconds=3600
+<end>
+
+####END of TFN LOOKUP Checks
+
+<start>
+type=FilesOlder
+key=WestpacDataMissingPerl
+Limits=70|80|100
+Name=Westpac Gateway data not downloaded Perl script not running
+description=Checks that the Westpac Gateway Data has been downloaded for the current day based on the perl script logs
+folder=\\pasmartprod\Westpac_Rollover_Converter\WESTPAC_GATEWAY_DATA\
+filter=*
+Remediation=Check that the scheduled task is running on PASMARTPROD
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Westpac%20Gateway%20Data%20not%20imported%20by%20Perl%20Script.aspx
+HoursToRun=7-14
+minutesold=15
+<end>
+
+#<start>
+#type=Sql
+#key=Sql-EMsgNotSentFSS
+#Limits=1|1|1
+#Name=Messages not sent from FSSPROD Payment Reversed Prior Authorisation
+#description=Checks the number of messages in the registry that have not successfully been picked up and sent due to Payment Reversed
+#sql=multi:@
+#select  count(*)
+#from db2inst1.electronic_message
+#where status = 'AM'
+#and long_description = 'Payment reversed prior to authorisation.'
+#with ur;
+#@
+#dbtype=DB2
+#connection=fssprod
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/REGI_TEMP_10144.aspx
+#TimeFrequencyInSeconds=1800
+#<end>
+
+## MDIS Checks - Start ##
+
+<start>
+type=DiskSpace
+key=PASMSADPPROD02-diskspace
+Limits=3500|1500|500
+Name=Free space on PASMSADPPROD02
+description=Free space on PASMSADPPROD02 C drive.
+Remediation=Delete or compress files to free up disk space. For virtual machines, you can also increase the disk capacity.
+machine=PASMSADPPROD02
+<end>
+
+<start>
+type=DiskSpace
+key=PASMSADPPROD03-diskspace
+Limits=3500|1500|500
+Name=Free space on PASMSADPPROD03
+description=Free space on PASMSADPPROD03 C drive.
+Remediation=Delete or compress files to free up disk space. For virtual machines, you can also increase the disk capacity.
+machine=PASMSADPPROD03
+<end>
+
+<start>
+type=DiskSpace
+key=PASMSMSHPROD10-diskspace
+Limits=3500|1500|500
+Name=Free space on PASMSMSHPROD10
+description=Free space on PASMSMSHPROD10 C drive.
+Remediation=Delete or compress files to free up disk space. For virtual machines, you can also increase the disk capacity.
+machine=PASMSMSHPROD10
+<end>
+
+<start>
+type=DiskSpace
+key=PASMSMSHPROD11-diskspace
+Limits=3500|1500|500
+Name=Free space on PASMSMSHPROD11
+description=Free space on PASMSMSHPROD11 C drive.
+Remediation=Delete or compress files to free up disk space. For virtual machines, you can also increase the disk capacity.
+machine=PASMSMSHPROD11
+<end>
+
+<start>
+type=ADUser
+key=AON_ADUser-app_smsjobaonm_prod
+Limits=1|2|3
+name=AON MDIS scheduled jobs Account
+username=PILLAR\app_smsjobaonm_prod
+descriptionOfImpact=This account is used to run the scheduled overnight job on pasmsjobprod01 which produce two reconciliation reports.
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10149.aspx
+TimeFrequencyInSeconds=120
+<end>
+
+<start>
+type=WebPage
+key=AON_WebPage-SSOtoLonsec
+managed=False
+method=GET
+url=https://aon.onetrust.com.au/
+name=AON MDIS Onetrust SSO LandingPage 
+descriptionOfImpact=SSO will fail - AON MDIS members will be unable to access Lonsec 
+Remediation= SSO will fail - AON MDIS members will be unable to access Lonsec. 1. Contact Lonsec using AON MDIS Issue form. 2. Advise Aon Client Management Team IMMEDIATELY.
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10151.aspx 
+<end>
+
+<start>
+type=WebPage
+key=WebPage-MDIS_AON_MEMBERS
+method=GET
+url=https://services.pillar.com.au/AONMembers/
+name=AON Members Website 
+Remediation=Check that the Secure AOM Members Website is active - https://services.pillar.com.au/aonmembers  
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/WEBS_MEMB_10150.aspx
+<end>
+
+<start>
+type=WebPage
+key=WebPage-MDIS_AON_ADVISORS
+method=GET
+url=https://services.pillar.com.au/AONAdvisers/
+name=AON Adviser Website 
+Remediation=Check the Private AON Adviser Website is active - https://services.pillar.com.au/AONAdvisers 
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/WEBS_MEMB_10150.aspx
+<end>
+
+<start>
+type=WebPage
+key=AON_WebPage-MDISAdapterAonStaff
+method=GET
+url=http://pasmsadpprod03:1001/mdis/aonstaffadapter/service?wsdl
+name=MDIS Outbound Adapter AONSTAFF Web Service  
+Remediation=Check the Oban.Mdis.Aonstaff.Adapter.Outbound.Service is running.  Check the pasmsadpprod03\\c$\Logs\oban\Adapter\MDIS_AONSTAFF_Adapter_Outbound.log for errors. Restart the service.
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10154.aspx
+HoursCanRun=1-22
+<end>
+
+<start>
+type=WebPage
+key=WebPage-MDISAdapterVivaCorp
+method=GET
+url=http://pasmsadpprod03/mdis/aonadapter/service?wsdl
+name=MDIS Outbound Adapter VIVACORP Web Service  
+Remediation=Check the Oban.Mdis.Aonstaff.Adapter.Outbound.Service is running.  Check the pasmsadpprod03\\c$\Logs\oban\Adapter\MDIS_VIVACORP_Adapter_Outbound.log for errors. Restart the service.
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10154.aspx
+HoursCanRun=1-22
+<end>
+
+<start>
+type=WebPage
+key=AON.MDIS.RavenDB.Web.pasmsmshprod11
+method=GET
+name=MDIS RavenDB AONSTAFF VIVACORP Web pasmsmshprod11
+url=http://pasmsmshprod11:8080/
+Remediation=Provides interface to RavenDB. Restart the RavenDB Service on pasmsmshprod11
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10153.aspx
+<end>
+
+<start>
+type=WebPage
+key=AON.MDIS.RavenDB.Web.pasmsmshprod10
+method=GET
+name=MDIS RavenDB AONSTAFF VIVACORP  Web pasmsmshprod10
+url=http://pasmsmshprod10:8080/
+Remediation=Provides interface to RavenDB. Restart the RavenDB Service on pasmsmshprod10
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10153.aspx
+<end>
+
+<start>
+type=WebPage
+key=AON.MDIS.RavenDB.Web.pasmsadpprod03
+method=GET
+name=MDIS RavenDB AONSTAFF VIVACORP Web pasmsadpprod03
+url=http://pasmsadpprod03:8080/
+Remediation=Provides interface to RavenDB. Restart the RavenDB Service on pasmsmshprod03
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10153.aspx
+<end>
+
+<start>
+type=WebPage
+key=AON.MDIS.RavenDB.Web.pasmsadpprod02
+method=GET
+name=MDIS RavenDB FSS Web pasmsadpprod02
+url=http://pasmsadpprod03:8080/
+Remediation=Provides interface to RavenDB. Restart the RavenDB Service on pasmsmshprod02
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10153.aspx
+<end>
+
+
+<start>
+type=SERVICESTATUS
+key=Oban.Mdis.Aonstaff.Adapter.Inbound.Service
+machine=pasmsadpprod03
+service=Oban.Mdis.Aonstaff.Adapter.Inbound.Service
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10154.aspx
+HoursCanRun=1-22
+<end>
+
+<start>
+type=SERVICESTATUS
+key=Oban.Mdis.Aonstaff.Adapter.Outbound.Service
+machine=pasmsadpprod03
+service=Oban.Mdis.Aonstaff.Adapter.Outbound.Service
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10154.aspx
+HoursCanRun=1-22
+<end>
+
+<start>
+type=SERVICESTATUS
+key=Oban.Mdis.Vivacorp.Adapter.Inbound.Service
+machine=pasmsadpprod03
+service=Oban.Mdis.Vivacorp.Adapter.Inbound.Service
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10154.aspx
+HoursCanRun=1-22
+<end>
+
+<start>
+type=SERVICESTATUS
+key=Oban.Mdis.Vivacorp.Adapter.Outbound.Service
+machine=pasmsadpprod03
+service=Oban.Mdis.Vivacorp.Adapter.Outbound.Service
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10154.aspx
+HoursCanRun=1-22
+<end>
+
+<start>
+type=SERVICESTATUS
+key=Oban.Messageservicehandler.Service11
+machine=pasmsmshprod11
+service=Oban.Messageservicehandler.Service
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10154.aspx
+<end>
+
+<start>
+type=SERVICESTATUS
+key=Oban.Messageservicehandler.Service10
+machine=pasmsmshprod10
+service=Oban.Messageservicehandler.Service
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10154.aspx
+<end>
+
+<start>
+type=SERVICESTATUS
+key=AON.MDIS.MSMQ.pasmsadpprod03
+machine=pasmsadpprod03
+service=MSMQ
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10152.aspx
+<end>
+
+<start>
+type=SERVICESTATUS
+key=AON.MDIS.MSMQ.pasmsadpprod02
+machine=pasmsadpprod02
+service=MSMQ
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10152.aspx
+<end>
+
+<start>
+type=SERVICESTATUS
+key=AON.MDIS.MSMQ.pasmsmshprod11
+machine=pasmsmshprod11
+service=MSMQ
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10152.aspx
+<end>
+
+<start>
+type=SERVICESTATUS
+key=AON.MDIS.MSMQ.pasmsmshprod10
+machine=pasmsmshprod10
+service=MSMQ
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10152.aspx
+<end>
+
+<start>
+type=SERVICESTATUS
+key=AON.MDIS.RavenDB.pasmsmshprod10
+machine=pasmsmshprod10
+service=RavenDB
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10153.aspx
+<end>
+
+<start>
+type=SERVICESTATUS
+key=AON.MDIS.RavenDB.pasmsmshprod11
+machine=pasmsmshprod11
+service=RavenDB
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10153.aspx
+<end>
+
+<start>
+type=SERVICESTATUS
+key=AON.MDIS.RavenDB.pasmsadpprod03
+machine=pasmsadpprod03
+service=RavenDB
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10153.aspx
+<end>
+
+<start>
+type=SERVICESTATUS
+key=AON.MDIS.RavenDB.pasmsadpprod02
+machine=pasmsadpprod02
+service=RavenDB
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10153.aspx
+<end>
+
+<start>
+type=SERVICESTATUS
+key=AON.MDIS.Schedule.pasmsjobprod01
+machine=pasmsjobprod01
+service=Schedule
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10149.aspx
+<end>
+
+
+<start>
+type=MQCount
+key=MSMQCount-mdis_aonstaff_adapter_outbound_pasmsadpprod03
+Limits=10|12|20
+machine=pasmsadpprod03
+queue=private$\mdis_aonstaff_adapter_outbound
+Remediation=Check the services are running and that the message queues are working and that there are no other issues with pasmsadpprod03 or messaging.
+HoursCanRun=13-11
+<end>
+
+<start>
+type=MQCount
+key=MSMQCount-mdis_aonstaff_adapter_inbound_pasmsadpprod03
+Limits=10|12|20
+machine=pasmsadpprod03
+queue=private$\mdis_aonstaff_adapter_inbound
+Remediation=Check the services are running and that the message queues are working and that there are no other issues with pasmsadpprod03 or messaging.
+HoursCanRun=13-11
+<end>
+
+<start>
+type=MQCount
+key=MSMQCount-mdis_vivacorp_adapter_outbound_pasmsadpprod03
+Limits=10|12|20
+machine=pasmsadpprod03
+queue=private$\mdis_vivacorp_adapter_outbound
+Remediation=Check the services are running and that the message queues are working and that there are no other issues with pasmsadpprod03 or messaging.
+HoursCanRun=13-11
+<end>
+
+<start>
+type=MQCount
+key=MSMQCount-mdis_vivacorp_adapter_inbound_pasmsadpprod03
+Limits=10|12|20
+machine=pasmsadpprod03
+queue=private$\mdis_vivacorp_adapter_inbound
+Remediation=Check the services are running and that the message queues are working and that there are no other issues with pasmsadpprod03 or messaging.
+HoursCanRun=13-11
+<end>
+
+<start>
+type=MQCount
+key=MSMQCount-messageservicehandler_pasmsmshprod10
+Limits=10|12|20
+machine=pasmsmshprod10
+queue=private$\messageservicehandler
+Remediation=Check the services are running and that the message queues are working and that there are no other issues with pasmsadpprod03 or messaging.
+HoursCanRun=13-11
+<end>
+
+<start>
+type=MQCount
+key=MSMQCount-messageservicehandler_pasmsmshprod11
+Limits=10|12|20
+machine=pasmsmshprod11
+queue=private$\messageservicehandler
+Remediation=Check the services are running and that the message queues are working and that there are no other issues with pasmsadpprod03 or messaging.
+HoursCanRun=13-11
+<end>
+
+<start>
+type=FolderSize
+key=FolderSize-MSMQ-ADP03
+folder=\\PASMSADPPROD03\c$\Windows\System32\msmq\storage
+name=PASMSADPPROD03 - MSMQ size
+Limits=5000|7000|7500
+Remediation=Execute the process to delete old messages from the MSMQ's on PASMSADPPROD03. See sharepoint instructions for details. 
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Message%20Service%20Handler%20Archiving.aspx
+<end>
+
+<start>
+type=FolderSize
+key=FolderSize-MSMQ-ADP02
+folder=\\PASMSADPPROD02\c$\Windows\System32\msmq\storage
+name=PASMSADPPROD02 - MSMQ size
+Limits=5000|7000|7500
+Remediation=Execute the process to delete old messages from the MSMQ's on PASMSADPPROD02. See sharepoint instructions for details. 
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Message%20Service%20Handler%20Archiving.aspx
+<end>
+
+<start>
+type=FolderSize
+key=FolderSize-MSMQ-MSH10
+folder=\\PASMSMSHPROD10\c$\Windows\System32\msmq\storage
+name=PASMSMSHPROD10 - MSMQ size
+Limits=5000|7000|7500
+Remediation=Execute the process to delete old messages from the MSMQ's on PASMSMSHPROD10. See sharepoint instructions for details. 
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Message%20Service%20Handler%20Archiving.aspx
+<end>
+
+<start>
+type=FolderSize
+key=FolderSize-MSMQ-MSH11
+folder=\\PASMSMSHPROD11\c$\Windows\System32\msmq\storage
+name=PASMSMSHPROD11 - MSMQ size
+Limits=5000|7000|7500
+Remediation=Execute the process to delete old messages from the MSMQ's on PASMSMSHPROD11. See sharepoint instructions for details. 
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Message%20Service%20Handler%20Archiving.aspx
+<end>
+
+<start>
+type=FileLastWrite
+key=Aon_Mdis_ReportSuperBLonsec_AON
+Limits=1440|1500|3000
+Name=Report SuperB Lonsec AONSTAFF 
+Description=Checks the yyyymmddReportSuperBLonsec_Aon.xlsx file has been generated from scheduled task on PASMSJOBPROD01.
+folder=\\suprspr4\tmp
+filter=*ReportSuperBLonsec_AON.xlsx
+Remediation=This file should be recreated each day at 10:15pm by a scheduled job (called ExtractUpdateDiMovements) which runs on PASMSJOBPROD01.  If the file is more than 24 hours old there may have been a problem with the scheduled job.
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10155.aspx
+DaysCanRun=2-6
+HoursCanRun=1-15
+<end>
+
+<start>
+type=FileLastWrite
+key=VIVA_MDIS_ReportSuperBLonsec_VIVA
+Limits=1440|1500|3000
+Name=Report SuperB Lonsec VIVACORP
+Description=Checks the yyyymmddReportSuperBLonsec_VIVA.xlsx file has been generated from scheduled task on PASMSJOBPROD01.
+folder=\\suprspr4\tmp
+filter=*ReportSuperBLonsec_VIVA.xlsx
+Remediation=This file should be recreated each day at 10:15pm by a scheduled job (called ExtractUpdateDiMovements) which runs on PASMSJOBPROD01.  If the file is more than 24 hours old there may have been a problem with the scheduled job.
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10155.aspx
+DaysCanRun=2-6
+HoursCanRun=1-15
+<end>
+
+<start>
+type=FileLastWrite
+key=ReportMemberDiSummaryXML
+Limits=1400|1500|3000
+Name=Report Member DI Summary XML Output
+Description=Checks the yyyymmddReportMemberDiSummary.xml file has been generated from scheduled task on PASMSJOBPROD01.
+folder=\\suprspr4\tmp
+filter=*ReportMemberDiSummary.xml
+Remediation=This file should be recreated each day at 10:15pm by a scheduled job (called ExtractUpdateDiMovements) which runs on PASMSJOBPROD01.  If the file is more than 24 hours old there may have been a problem with the scheduled job.
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10155.aspx
+DaysCanRun=2-6
+HoursCanRun=1-15
+<end>
+
+
+<start>
+type=SQL
+key=Mdis_AON_ReportMemberDiSummary
+Limits=10|10|10
+Name=MDIS ReportMemberDiSummary AONSTAFF VIVACORP  check files received inbound
+description=check that ReportMemberDiSummary files have been received from Lonsec Recreo previous day. Sent daily from Lonsec between 20:30 and 22:00
+sql=multi:@
+select CASE WHEN count(*) > 0 THEN 0 ELSE 10 END AS FILELIMIT from
+(SELECT VARCHAR_FORMAT(um.CREATED_DATETIME, 'YYYY/MM/DD'),VARCHAR_FORMAT(um.CREATED_DATETIME,'HH12:Mi AM'), um.CREATED_DATETIME
+, um.MESSAGE_COLLAB_ACTION ,um.MESSAGE_COLLAB_CONVERSATION_ID, bm.MESSAGE_DIRECTION, bm.CONTENT_DATA, bm.PAYLOAD_CONTENT_DATA_ID, bm.PERSISTENCE_ID from MSH2.EB_USER_MESSAGE um
+left join
+(Select sd.CONTENT_DATA, sd.PAYLOAD_CONTENT_DATA_ID,uh.MESSAGE_DIRECTION,uh.MESSAGE_STATUS,uh.PERSISTENCE_ID,uh.HEADER_ID from MSH2.HEADER uh
+inner join (SELECT ms.CONTENT_DATA, ms.PAYLOAD_CONTENT_DATA_ID, ud.MESSAGE_DATA,ud.MESSAGE_FORMAT,ud.PERSISTENCE_ID from MSH2.PERSISTENCE ud
+inner join (SELECT dd.CONTENT_DATA, mm.PERSISTENCE_ID,mm.PAYLOAD_CONTENT_DATA_ID,mm.CONTENT_TYPE FROM MSH2.PAYLOAD mm
+inner join (SELECT CONTENT_DATA,PAYLOAD_CONTENT_DATA_ID from MSH2.PAYLOAD_CONTENT_DATA dd )dd
+on mm.PAYLOAD_CONTENT_DATA_ID = dd.PAYLOAD_CONTENT_DATA_ID ) ms
+on ud.PERSISTENCE_ID = ms.PERSISTENCE_ID ) sd
+on uh.PERSISTENCE_ID = sd.PERSISTENCE_ID ) bm
+on um.HEADER_ID = bm.HEADER_ID
+WHERE um.CREATED_DATETIME > (CURRENT_DATE - 1 DAY)  and um.CREATED_DATETIME < CURRENT_DATE and um.MESSAGE_COLLAB_ACTION
+in ('ReportMemberDiSummary') and um.MESSAGE_COLLAB_CONVERSATION_ID like '%MdisLonsec%'
+ORDER BY um.CREATED_DATETIME desc )
+with UR;
+@
+dbtype=DB2
+connection=MSHPROD
+#HoursCanRun=13-14
+Remediation=Escalate to Lonsec/Recreo Support with Issue escalation form, details: Pillar did not receive the ReportMemberDisummary file(s) for today. Please ensure it is sent tomorrow 
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10155.aspx
+<end>
+
+<start>
+type=SQL
+key=AonStaff_Mdis_UpdateDiMovements
+Limits=10|10|10
+Name=MDIS UpdateDiMovements AONSTAFF  check files sent from Pillar previous business day
+description=check that UpdateDiMovements files have been sent previous business day. Sent MON-FRI from Pillar to Lonsec at 20:30. Checked Tue – Sat.
+sql=multi:@
+select CASE WHEN count(*) = 1 THEN 0 ELSE 10 END AS FILELIMIT from (
+SELECT um.CREATED_DATETIME, um.MESSAGE_COLLAB_ACTION ,um.MESSAGE_COLLAB_CONVERSATION_ID, bm.MESSAGE_DIRECTION, bm.CONTENT_DATA, bm.PAYLOAD_CONTENT_DATA_ID, bm.PERSISTENCE_ID from MSH2.EB_USER_MESSAGE um
+left join
+(Select sd.CONTENT_DATA, sd.PAYLOAD_CONTENT_DATA_ID,uh.MESSAGE_DIRECTION,uh.MESSAGE_STATUS,uh.PERSISTENCE_ID,uh.HEADER_ID from MSH2.HEADER uh
+inner join (SELECT ms.CONTENT_DATA, ms.PAYLOAD_CONTENT_DATA_ID, ud.MESSAGE_DATA,ud.MESSAGE_FORMAT,ud.PERSISTENCE_ID from MSH2.PERSISTENCE ud
+inner join (SELECT dd.CONTENT_DATA, mm.PERSISTENCE_ID,mm.PAYLOAD_CONTENT_DATA_ID,mm.CONTENT_TYPE FROM MSH2.PAYLOAD mm
+inner join (SELECT CONTENT_DATA,PAYLOAD_CONTENT_DATA_ID from MSH2.PAYLOAD_CONTENT_DATA dd )dd
+on mm.PAYLOAD_CONTENT_DATA_ID = dd.PAYLOAD_CONTENT_DATA_ID ) ms
+on ud.PERSISTENCE_ID = ms.PERSISTENCE_ID ) sd
+on uh.PERSISTENCE_ID = sd.PERSISTENCE_ID ) bm
+on um.HEADER_ID = bm.HEADER_ID
+WHERE um.CREATED_DATETIME > (CURRENT_DATE - 1 DAY)  and um.CREATED_DATETIME < CURRENT_DATE and um.MESSAGE_COLLAB_ACTION
+in ('UpdateDiMovements')and um.MESSAGE_COLLAB_CONVERSATION_ID like '%AonSuperB%'
+)
+with UR;
+@
+dbtype=DB2
+connection=MSHPROD
+DaysCanRun=2-6
+HoursCanRun=13-14
+Remediation=Check the Outbound Adapter log files for the appropriate outbound adapter for errors.
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10156.aspx
+<end>
+
+<start>
+type=SQL
+key=AonViva_Mdis_UpdateDiMovements
+Limits=10|10|10
+Name=MDIS UpdateDiMovements VIVACORP check files sent from Pillar previous business day
+description=check that UpdateDiMovements files have been sent previous business day. Sent MON-FRI from Pillar to Lonsec at 20:30. Checked Tue – Sat.
+sql=multi:@
+select CASE WHEN count(*) = 1 THEN 0 ELSE 10 END AS FILELIMIT from (
+SELECT um.CREATED_DATETIME, um.MESSAGE_COLLAB_ACTION ,um.MESSAGE_COLLAB_CONVERSATION_ID, bm.MESSAGE_DIRECTION, bm.CONTENT_DATA, bm.PAYLOAD_CONTENT_DATA_ID, bm.PERSISTENCE_ID from MSH2.EB_USER_MESSAGE um
+left join
+(Select sd.CONTENT_DATA, sd.PAYLOAD_CONTENT_DATA_ID,uh.MESSAGE_DIRECTION,uh.MESSAGE_STATUS,uh.PERSISTENCE_ID,uh.HEADER_ID from MSH2.HEADER uh
+inner join (SELECT ms.CONTENT_DATA, ms.PAYLOAD_CONTENT_DATA_ID, ud.MESSAGE_DATA,ud.MESSAGE_FORMAT,ud.PERSISTENCE_ID from MSH2.PERSISTENCE ud
+inner join (SELECT dd.CONTENT_DATA, mm.PERSISTENCE_ID,mm.PAYLOAD_CONTENT_DATA_ID,mm.CONTENT_TYPE FROM MSH2.PAYLOAD mm
+inner join (SELECT CONTENT_DATA,PAYLOAD_CONTENT_DATA_ID from MSH2.PAYLOAD_CONTENT_DATA dd )dd
+on mm.PAYLOAD_CONTENT_DATA_ID = dd.PAYLOAD_CONTENT_DATA_ID ) ms
+on ud.PERSISTENCE_ID = ms.PERSISTENCE_ID ) sd
+on uh.PERSISTENCE_ID = sd.PERSISTENCE_ID ) bm
+on um.HEADER_ID = bm.HEADER_ID
+WHERE um.CREATED_DATETIME > (CURRENT_DATE - 1 DAY)  and um.CREATED_DATETIME < CURRENT_DATE and um.MESSAGE_COLLAB_ACTION
+in ('UpdateDiMovements')and um.MESSAGE_COLLAB_CONVERSATION_ID like '%VivaSuperB%'
+)
+with UR;
+@
+dbtype=DB2
+connection=MSHPROD
+DaysCanRun=2-6
+HoursCanRun=13-14
+Remediation=Check the Outbound Adapter log files for the appropriate outbound adapter for errors.
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10156.aspx
+<end>
+
+<start>
+type=SQL
+key=Aon_Mdis_UpdateMemberDetails
+Limits=10|10|10
+Name=MDIS UpdateMemberDetails AONSTAFF  check files sent from Pillar previous business day
+description=check that UpdateMemberDetails files have been sent previous business day. Sent MON-FRI from Pillar to Lonsec at 20:30. Checked Tue – Sat.
+sql=multi:@
+select CASE WHEN current_date = '2016-10-19' THEN 0 WHEN count(*) = 1 THEN 0 ELSE 10 END AS FILELIMIT from (
+SELECT um.CREATED_DATETIME, um.MESSAGE_COLLAB_ACTION ,um.MESSAGE_COLLAB_CONVERSATION_ID, bm.MESSAGE_DIRECTION, bm.CONTENT_DATA, bm.PAYLOAD_CONTENT_DATA_ID, bm.PERSISTENCE_ID from MSH2.EB_USER_MESSAGE um
+left join
+(Select sd.CONTENT_DATA, sd.PAYLOAD_CONTENT_DATA_ID,uh.MESSAGE_DIRECTION,uh.MESSAGE_STATUS,uh.PERSISTENCE_ID,uh.HEADER_ID from MSH2.HEADER uh
+inner join (SELECT ms.CONTENT_DATA, ms.PAYLOAD_CONTENT_DATA_ID, ud.MESSAGE_DATA,ud.MESSAGE_FORMAT,ud.PERSISTENCE_ID from MSH2.PERSISTENCE ud
+inner join (SELECT dd.CONTENT_DATA, mm.PERSISTENCE_ID,mm.PAYLOAD_CONTENT_DATA_ID,mm.CONTENT_TYPE FROM MSH2.PAYLOAD mm
+inner join (SELECT CONTENT_DATA,PAYLOAD_CONTENT_DATA_ID from MSH2.PAYLOAD_CONTENT_DATA dd )dd
+on mm.PAYLOAD_CONTENT_DATA_ID = dd.PAYLOAD_CONTENT_DATA_ID ) ms
+on ud.PERSISTENCE_ID = ms.PERSISTENCE_ID ) sd
+on uh.PERSISTENCE_ID = sd.PERSISTENCE_ID ) bm
+on um.HEADER_ID = bm.HEADER_ID
+WHERE um.CREATED_DATETIME > (CURRENT_DATE - 1 DAY)  and um.CREATED_DATETIME < CURRENT_DATE and um.MESSAGE_COLLAB_ACTION
+in ('UpdateMemberDetails')
+and um.MESSAGE_COLLAB_CONVERSATION_ID like '%AonSuperB%'
+)
+with UR;
+@
+dbtype=DB2
+connection=MSHPROD
+DaysCanRun=2-6
+HoursCanRun=13-14
+Remediation=Check the Outbound Adapter log files for the appropriate outbound adapter for errors.
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10156.aspx
+<end>
+
+<start>
+type=SQL
+key=Viva_Mdis_UpdateMemberDetails
+Limits=10|10|10
+Name=MDIS UpdateMemberDetails VIVACORP check files sent from Pillar previous business day
+description=check that UpdateMemberDetails files have been sent previous business day. Sent MON-FRI from Pillar to Lonsec at 20:30. Checked Tue – Sat.
+sql=multi:@
+select CASE WHEN current_date = '2016-10-19' THEN 0 WHEN count(*) = 1 THEN 0 ELSE 10 END AS FILELIMIT from (
+SELECT um.CREATED_DATETIME, um.MESSAGE_COLLAB_ACTION ,um.MESSAGE_COLLAB_CONVERSATION_ID, bm.MESSAGE_DIRECTION, bm.CONTENT_DATA, bm.PAYLOAD_CONTENT_DATA_ID, bm.PERSISTENCE_ID from MSH2.EB_USER_MESSAGE um
+left join
+(Select sd.CONTENT_DATA, sd.PAYLOAD_CONTENT_DATA_ID,uh.MESSAGE_DIRECTION,uh.MESSAGE_STATUS,uh.PERSISTENCE_ID,uh.HEADER_ID from MSH2.HEADER uh
+inner join (SELECT ms.CONTENT_DATA, ms.PAYLOAD_CONTENT_DATA_ID, ud.MESSAGE_DATA,ud.MESSAGE_FORMAT,ud.PERSISTENCE_ID from MSH2.PERSISTENCE ud
+inner join (SELECT dd.CONTENT_DATA, mm.PERSISTENCE_ID,mm.PAYLOAD_CONTENT_DATA_ID,mm.CONTENT_TYPE FROM MSH2.PAYLOAD mm
+inner join (SELECT CONTENT_DATA,PAYLOAD_CONTENT_DATA_ID from MSH2.PAYLOAD_CONTENT_DATA dd )dd
+on mm.PAYLOAD_CONTENT_DATA_ID = dd.PAYLOAD_CONTENT_DATA_ID ) ms
+on ud.PERSISTENCE_ID = ms.PERSISTENCE_ID ) sd
+on uh.PERSISTENCE_ID = sd.PERSISTENCE_ID ) bm
+on um.HEADER_ID = bm.HEADER_ID
+WHERE um.CREATED_DATETIME > (CURRENT_DATE - 1 DAY)  and um.CREATED_DATETIME < CURRENT_DATE and um.MESSAGE_COLLAB_ACTION
+in ('UpdateMemberDetails')
+and um.MESSAGE_COLLAB_CONVERSATION_ID like '%VivaSuperB%'
+)
+with UR;
+@
+dbtype=DB2
+connection=MSHPROD
+DaysCanRun=2-6
+HoursCanRun=13-14
+Remediation=Check the Outbound Adapter log files for the appropriate outbound adapter for errors.
+RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Standard%20Change%20Procedures/MESS_AON%20_10156.aspx
+<end>
+
+######################################################################################################################################
+# No longer needed - removed 28/11/2016 JB
+#<start>
+#type=Sql
+#key=Sql-MsgNotSentFSS
+#Limits=1|10|20
+#Name=Messages not sent from FSSPROD
+#description=Checks the number of messages in the registry that have not successfully been picked up and sent
+#sql=multi:@
+#select  count(*) 
+#+ (select count(*) from db2inst1.rollover_request where status = 'AM'and last_modified < current timestamp - 1 hours) 
+#+ (select count(*) from db2inst1.rollover_payment where status = 'AM'and last_modified < current timestamp - 1 hours)
+#from db2inst1.electronic_message
+#where status = 'AM' and last_modified < current timestamp - 1 hours
+#with ur
+#@
+#dbtype=DB2
+#connection=fssprod
+#Remediation=Check the fund outbound adaptor is started, check the adaptor logs, check the source data in the registry.
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/How%20to%20Check%20DS%20Rollovers%20Messages%20Not%20Sent.aspx
+#TimeFrequencyInSeconds=1800
+#<end>
+
+#<start>
+#type=Sql
+#key=Sql-MsgNotSentFTC
+#Limits=1|10|20
+#Name=Messages not sent from FTCPROD
+#description=Checks the number of messages in the registry that have not successfully been picked up and sent
+#sql=multi:@
+#select  count(*)
+#+ (select count(*) from rollover_request where status = 'AM'and last_modified < current timestamp - 1 hours)
+#+ (select count(*) from rollover_payment where status = 'AM'and last_modified < current timestamp - 1 hours)
+#from electronic_message
+#where status = 'AM' and last_modified < current timestamp - 1 hours
+#with ur;
+#@
+#dbtype=DB2
+#connection=ftcprod
+#Remediation=Check the fund outbound adaptor is started, check the adaptor logs, check the source data in the registry.
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/How%20to%20Check%20DS%20Rollovers%20Messages%20Not%20Sent.aspx
+#TimeFrequencyInSeconds=1800
+#<end>
+
+#<start>
+#type=Sql
+#key=Sql-fssprod
+#Limits=2|2|2
+#Name=FSSPROD DB connection
+#description=Checks smartsrw can connect to fssprod
+#sql=select 1 FROM SYSIBM.SYSDUMMY1;
+#dbtype=DB2
+#connection=fssprod
+#Remediation=Ensure account is not locked or expired smartsrw
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Monitoring.aspx 
+#TimeFrequencyInSeconds=500
+#<end>
+
+#<start>
+#type=Sql
+#key=Sql-ftcprod
+#Limits=2|2|2
+#Name=FTCPROD DB connection
+#description=Checks smartsrw can connect to ftcprod
+#sql=select 1 FROM SYSIBM.SYSDUMMY1;
+#dbtype=DB2
+#connection=ftcprod
+#Remediation=Ensure account is not locked or expired smartsrw 
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Monitoring.aspx
+#TimeFrequencyInSeconds=500
+#<end>
+
+#<start>
+#type=Sql
+#key=Sql-psapprod
+#Limits=2|2|2
+#Name=PSAPPROD DB connection
+#description=Checks smartsrw can connect to psapprod
+#sql=select 1 FROM SYSIBM.SYSDUMMY1;
+#dbtype=DB2
+#connection=psapprod
+#Remediation=Ensure account is not locked or expired smartsrw 
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Monitoring.aspx
+#TimeFrequencyInSeconds=500
+#<end>
+
+#<start>
+#type=Sql
+#key=Sql-psisprod
+#Limits=2|2|2
+#Name=PSISPROD DB connection
+#description=Checks smartsrw can connect to psisprod
+#sql=select 1 from DB2INST1.CLIENT fetch first row only;
+#dbtype=DB2
+#connection=psisprod
+#Remediation=Ensure account is not locked or expired smartsrw 
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Monitoring.aspx
+#TimeFrequencyInSeconds=500
+#<end>
+
+##################################
+##Commented out as no longer needed with Project Eleanor.....taken off line 02/8/2016 close of business - CR37034
+#<start>
+#type=ServiceStatus
+#key=ServiceCheck-pasmartprod-FSSPROD
+#machine=pasmartprod
+#service=Syncsoft.SmartStream.Adapter.Inbound.FSSPROD-1.0.0
+#Remediation=Check the status of PASMARTPROD, check the relevant logs, take remedial action and restart the service if necessary
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+#<end>
+
+#<start>
+#type=ServiceStatus
+#key=ServiceCheck-pasmartprod-FTCPROD
+#machine=pasmartprod
+#service=Syncsoft.SmartStream.Adapter.Inbound.FTCPROD-1.0.0
+#Remediation=Check the status of PASMARTPROD, check the relevant logs, take remedial action and restart the service if necessary
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+#<end>
+##################################
+
+#removing check as adapters tunred off as part of blackout 15/11/2016 3:11pm
+#<start>
+#type=ServiceStatus
+#key=ServiceCheck-pasmartprod-PSAPPROD
+#machine=pasmartprod
+#service=Syncsoft.SmartStream.Adapter.Inbound.PSAPPROD-1.0.0
+#HoursCanRun=1-10,15-23
+#TimeFrequencyInSeconds=3600
+#Remediation=Check the status of PASMARTPROD, check the relevant logs, take remedial action and restart the service if necessary
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+#<end>
+#<start>
+#type=ServiceStatus
+#key=ServiceCheck-pasmartprod-PSISPROD
+#machine=pasmartprod
+#service=Syncsoft.SmartStream.Adapter.Inbound.PSISPROD-1.0.0
+#Remediation=Check the status of PASMARTPROD, check the relevant logs, take remedial action and restart the service if necessary
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+#<end>
+###############
+
+
+##Commented out as no longer needed with Project Eleanor.....taken off line 04/8/2016 close of business - CR37034
+#<start>
+#type=ServiceStatus
+#key=ServiceCheck-pasmartprod-Outbound.FSSPROD
+#machine=pasmartprod
+#service=Syncsoft.SmartStream.Adapter.Outbound.FSSPROD-1.0.0
+#Remediation=Check the status of PASMARTPROD, check the relevant logs, take remedial action and restart the service if necessary
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+#<end>
+
+#<start>
+#type=ServiceStatus
+#key=ServiceCheck-pasmartprod-Outbound.FTCPROD
+#machine=pasmartprod
+#service=Syncsoft.SmartStream.Adapter.Outbound.FTCPROD-1.0.0
+#Remediation=Check the status of PASMARTPROD, check the relevant logs, take remedial action and restart the service if necessary
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+#<end>
+
+#removing check as adapters tunred off as part of blackout 17/11/2016
+#<start>
+#type=ServiceStatus
+#key=ServiceCheck-pasmartprod-Outbound.PSAPPROD
+#machine=pasmartprod
+#service=Syncsoft.SmartStream.Adapter.Outbound.PSAPPROD-1.0.0
+#HoursCanRun=1-10,15-23
+#TimeFrequencyInSeconds=3600
+#Remediation=Check the status of PASMARTPROD, check the relevant logs, take remedial action and restart the service if necessary
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+#<end>
+#<start>
+#type=ServiceStatus
+#key=ServiceCheck-pasmartprod-Outbound.PSISPROD
+#machine=pasmartprod
+#service=Syncsoft.SmartStream.Adapter.Outbound.PSISPROD-1.0.0
+#Remediation=Check the status of PASMARTPROD, check the relevant logs, take remedial action and restart the service if necessary
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/Smart%20Stream%20Adapters.aspx
+#<end>
+
+
+## Will not work until EM account is added to allowed users for the site as it used windows authentication
+#<start>
+#type=WebPage
+#key=FWebPage-MessagingPortal
+#url=http://pasmartprod:81/MessagingPortal
+#name=Rollover hub - MessagingPortal  
+#<end>
+
+#<start>
+#type=Sql
+#key=Sql-MsgNotSentPSIS
+#Limits=1|10|20
+#Name=Messages not sent from PSISPROD
+#description=Checks the number of messages in the registry that have not successfully been picked up and sent
+#sql=multi:@
+#select  count(*)
+#+ (select count(*) from rollover_request where status = 'AM'and last_modified < current timestamp - 1 hours)
+#+ (select count(*) from rollover_payment where status = 'AM'and last_modified < current timestamp - 1 hours)
+#from electronic_message
+#where status = 'AM' and last_modified < current timestamp - 1 hours
+#with ur;
+#@
+#dbtype=DB2
+#connection=psisprod
+#Remediation=Check the fund outbound adaptor is started, check the adaptor logs, check the source data in the registry.
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/How%20to%20Check%20DS%20Rollovers%20Messages%20Not%20Sent.aspx
+#TimeFrequencyInSeconds=1800
+#<end>
+
+#<start>
+#type=Sql
+#key=Sql-MsgNotSentPSAPP
+#Limits=1|10|20
+#Name=Messages not sent from PSAPPROD
+#description=Checks the number of messages in the registry that have not successfully been picked up and sent
+#sql=multi:@
+#select count(*)
+#+ (select count(*) from rollover_request where status = 'AM'and last_modified < current timestamp - 1 hours
+#and (hour(current timestamp) > 14 or hour(current timestamp) < 12))
+#+ (select count(*) from rollover_payment where status = 'AM'and last_modified < current timestamp - 1 hours
+#and (hour(current timestamp) > 14 or hour(current timestamp) < 12))
+#from electronic_message
+#where status = 'AM' and last_modified < current timestamp - 1 hours
+#and (hour(current timestamp) > 14 or hour(current timestamp) < 12)
+#with ur;
+#@
+#dbtype=DB2
+#connection=psAPprod
+#Remediation=Check the fund outbound adaptor is started, check the adaptor logs, check the source data in the registry.
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/How%20to%20Check%20DS%20Rollovers%20Messages%20Not%20Sent.aspx
+#<end>
+
+
+#<start>
+#type=Sql
+#key=Sql-FailedFundLookupFSS
+#Limits=5|10|20
+#Name=Excessive Fund Lookup Errors from FSSPROD
+#description=Checks the number of fund lookup errors in the registry in the last hour
+#sql=multi:@
+#select count(conversation_id)
+#from db2inst1.ato_fund_lookup
+#where status = 'LE'
+#and date(created_datetime) = current date
+#with ur;
+#@
+#dbtype=DB2
+#connection=fssprod
+#Remediation=Check the atovalidationservice logs on PASMARTPROD for details of the fund lookup errors. Also refer to electronic_message table in registry for #details of error.
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/How%20to%20Check%20DS%20Rollovers%20Unsuccessful%20Fund%20Lookup.aspx
+#TimeFrequencyInSeconds=1800
+#<end>
+
+#<start>
+#type=Sql
+#key=Sql-FailedFundLookupFTC
+#Limits=5|10|20
+#Name=Excessive Fund Lookup Errors from FTCPROD
+#description=Checks the number of fund lookup errors in the registry in the last hour
+#sql=multi:@
+#select count(conversation_id)
+#from ato_fund_lookup
+#where status = 'LE'
+#and date(created_datetime) = current date
+#with ur;
+#@
+#dbtype=DB2
+#connection=ftcprod
+#Remediation=Check the atovalidationservice logs on PASMARTPROD for details of the fund lookup errors. Also refer to electronic_message table in registry for #details of error.
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/How%20to%20Check%20DS%20Rollovers%20Unsuccessful%20Fund%20Lookup.aspx
+#TimeFrequencyInSeconds=1800
+#<end>
+
+#<start>
+#type=Sql
+#key=Sql-FailedFundLookupPSAPP
+#Limits=5|10|20
+#Name=Excessive Fund Lookup Errors from PSAPPROD
+#description=Checks the number of fund lookup errors in the registry in the last hour
+#sql=multi:@
+#select count(conversation_id)
+#from ato_fund_lookup
+#where status = 'LE'
+#and date(created_datetime) = current date
+#with ur;
+#@
+#dbtype=DB2
+#connection=psAPprod
+#Remediation=Check the atovalidationservice logs on PASMARTPROD for details of the fund lookup errors. Also refer to electronic_message table in registry for #details of error.
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/How%20to%20Check%20DS%20Rollovers%20Unsuccessful%20Fund%20Lookup.aspx
+#TimeFrequencyInSeconds=1800
+#<end>
+
+#<start>
+#type=Sql
+#key=Sql-FailedFundLookupPSIS
+#Limits=5|10|20
+#Name=Excessive Fund Lookup Errors from PSISPROD
+#description=Checks the number of fund lookup errors in the registry in the last hour
+#sql=multi:@
+#select count(conversation_id)
+#from ato_fund_lookup
+#where status = 'LE'
+#and date(created_datetime) = current date
+#with ur;
+#@
+#dbtype=DB2
+#connection=psisprod
+#Remediation=Check the atovalidationservice logs on PASMARTPROD for details of the fund lookup errors. Also refer to electronic_message table in registry for #details of error.
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/How%20to%20Check%20DS%20Rollovers%20Unsuccessful%20Fund%20Lookup.aspx
+#TimeFrequencyInSeconds=1800
+#<end>
+
+#<start>
+#type=Sql
+#key=Sql-TFNlookupPSIS
+#select count(*) from ( select  a.* from db2inst1.ato_tfn_lookup a join rollover_payment rp on rp.conversation_id = a.conversation_id where a.returned_status = #'' and a.created_datetime < (current timestamp - 5 hours) and rp.status not in ('EV','AK','MS','AM','IP','PC','ER','CA') ) with ur;
+#btype=DB2
+#connection=psisprod
+#emediation=Check the data for known issues. Check the atovalidationservice logs on PASMARTPROD for errors
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/How%20to%20Check%20DS%20Rollovers%20Unsuccessful%20TFN%20Lookup.aspx
+#TimeFrequencyInSeconds=3600
+#<end>
+
+#<start>
+#type=Sql
+#key=Sql-TFNlookupPSAPP
+#Limits=1|10|20
+#Name=TFN lookups unsuccessful PSAPPROD
+#description=Checks the number of TFN Lookups in the registry that have not successfully completed
+#sql=select count(*) from ( select  a.* from db2inst1.ato_tfn_lookup a join db2inst1.rollover_payment rp on rp.conversation_id = a.conversation_id where #a.returned_status = '' and a.created_datetime < (current timestamp - 5 hours) and rp.status not in ('EV','AK','MS','AM','IP','PC','ER','CA') ) with ur;
+#dbtype=DB2
+#connection=psAPprod
+#Remediation=Check the data for known issues. Check the atovalidationservice logs on PASMARTPROD for errors
+#RemediationUrl=http://intranet.pillar.com.au/aboutus/BusinessUnits/IT/Knowledge%20Base/How%20to%20Check%20DS%20Rollovers%20Unsuccessful%20TFN%20Lookup.aspx
+#TimeFrequencyInSeconds=3600
+#<end>
+
+
+
+
